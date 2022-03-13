@@ -2,8 +2,10 @@
 
 import logging
 import os
+import time
 from dotenv import load_dotenv
 import discord
+from userdata import PointsData
 # Configure logging for both logging to a file and logging to stdout.
 logging.basicConfig(
     level=logging.DEBUG,
@@ -15,6 +17,8 @@ logging.basicConfig(
 )
 
 client = discord.Client()  # create our client
+
+data = PointsData('data.json')
 
 
 @client.event
@@ -33,8 +37,32 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith('$hello'):
-        await message.channel.send('Hello!')
+    if message.content.startswith('!add'):
+        content = message.content
+        # format should be `!add @Saone#1234 num`
+
+        tokens = content.split()
+
+        print(tokens)
+
+        # insert into our data:
+        try:
+            for user in message.mentions:
+                data.modify_points(str(user), int(tokens[-1]))
+        except (ValueError, IndexError):
+            # if the message is malformed, don't do anything
+            await message.add_reaction('❌')
+            return
+
+        await message.add_reaction('✅')
+
+    if message.content.startswith('!showpoints'):
+        output = data.pretty_print()
+        output = "Points Summary: \n" + output
+        await message.channel.send(output)
+
+    # if message.content.startswith('!help'):
+    #     await message.channel.send("")
 
 
 def main():
