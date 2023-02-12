@@ -1,0 +1,9 @@
+version: '3'
+services:
+  portalbot:
+    container_name: 'tk_portalbot'
+    build: .
+    volumes:
+      - 'data.json:/opt/portalbot/data.json'
+      - '.env:/opt/portalbot/.env'
+    restart: unless-stopped
