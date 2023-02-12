@@ -11,7 +11,7 @@ logging.basicConfig(
     level=logging.WARNING,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("debug.log"),
+        logging.FileHandler("portalbot.log"),
         logging.StreamHandler()
     ]
 )
@@ -20,11 +20,25 @@ logging.basicConfig(
 # > Since discord.py 2.0, you must now activate privleged intents for
 # >  specific actions. Messages are one of those actions.
 intents = discord.Intents.default()
-intents.messages = True
-client = discord.Client(intents = intents)  # create our client
+intents.message_content = True
+client = discord.Client(intents=intents)  # create our client
 
 data = PointsData('data.json')
 mod_role_id = None
+
+
+def validate_role(message: discord.Message):
+    # validate that the message author has the right role:
+    user_has_role = False
+    for role in message.author.roles:
+        logging.debug(f"role id: {role.id}")
+        if int(role.id) == int(mod_role_id):
+            user_has_role = True
+            logging.debug("User has role.")
+            break
+
+    return user_has_role
+
 
 @client.event
 async def on_ready():
@@ -47,25 +61,15 @@ async def on_message(message: discord.Message):
         logging.debug(f'Got "add" message from {message.author.display_name}')
 
         # validate they have the right role:
-        user_has_role = False
-        for role in message.author.roles:
-            logging.debug(f"role id: {role.id}")
-            if int(role.id) == int(mod_role_id):
-                user_has_role = True
-                logging.debug("User has role.")
-                break
-
-        if not user_has_role:
+        if not validate_role(message):
             await message.add_reaction('❌')
-            logging.warning(f'User {str(message.author.display_name)} !add-ed without role.')
+            logging.warning(
+                f'User {str(message.author.display_name)} !add-ed without role.')
             return
 
         content = message.content
         # format should be `!add @Saone#1234 num`
-
         tokens = content.split()
-
-        print(tokens)
 
         # insert into our data:
         try:
@@ -77,6 +81,30 @@ async def on_message(message: discord.Message):
             await message.add_reaction('❌')
             await message.channel.send("Error parsing message. Try `!add <mention> num`.")
             logging.error(f'Error adding points to user {str(user)}')
+            return
+
+        await message.add_reaction('✅')
+
+    if message.content.startswith("!resetuser"):
+        logging.debug(
+            f'Got "resetuser" message from {message.author.display_name}')
+
+        # validate they have the right role:
+        if not validate_role(message):
+            await message.add_reaction('❌')
+            logging.warning(
+                f'User {str(message.author.display_name)} !resetuser-ed without role.')
+            return
+
+        try:
+            for user in message.mentions:
+                logging.debug(f'Resetting points for {str(user)}')
+                data.reset_points(str(user))
+        except (ValueError, IndexError):
+            # if the message is malformed, don't do anything
+            await message.add_reaction('❌')
+            await message.channel.send("Error parsing message. Try `!resetuser <mention>`.")
+            logging.error(f'Error resetting points for user {str(user)}')
             return
 
         await message.add_reaction('✅')

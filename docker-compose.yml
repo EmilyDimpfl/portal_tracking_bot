@@ -4,6 +4,6 @@ services:
     container_name: 'tk_portalbot'
     build: .
     volumes:
-      - 'data.json:/opt/portalbot/data.json'
-      - '.env:/opt/portalbot/.env'
+      - './data.json:/opt/portalbot/data.json'
+      - './.env:/opt/portalbot/.env'
     restart: unless-stopped

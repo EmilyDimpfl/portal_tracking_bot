@@ -31,6 +31,13 @@ class PointsData:
 
         self.filepath = filepath
 
+    def reset_points(self, user: str):
+        """
+        clears a user's points
+        """
+        points = self.get_points(user)
+        self.modify_points(user, -1 * points)
+
     def modify_points(self, user: str, delta: int):
         """
         adds or removes points from a user
@@ -69,6 +76,7 @@ class PointsData:
         """
         retstr = ""
         for key, value in self.data.items():
-            retstr += str(key) + ": " + str(value) + "\n"
+            if value != 0:
+                retstr += str(key) + ": " + str(value) + "\n"
 
         return retstr
