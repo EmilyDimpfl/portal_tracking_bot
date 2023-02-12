@@ -10,8 +10,10 @@ class PointsData:
     """
     class for managing the portal hunt points data structure, serializing, and deserializing
     """
+    data = {}
+    filepath = None
 
-    def __init__(self, filepath=None):
+    def __init__(self, filepath: str = None):
         """
         reads in data to set up our data structure
         """
@@ -29,7 +31,7 @@ class PointsData:
 
         self.filepath = filepath
 
-    def modify_points(self, user, delta: int):
+    def modify_points(self, user: str, delta: int):
         """
         adds or removes points from a user
         """
@@ -39,7 +41,7 @@ class PointsData:
 
         self.save_data(self.filepath)
 
-    def get_points(self, user):
+    def get_points(self, user: str):
         """
         returns the number of points a user has
         """
@@ -51,7 +53,7 @@ class PointsData:
 
         return 0
 
-    def save_data(self, filepath):
+    def save_data(self, filepath: str):
         """
         dumps our data structure to disk
         """

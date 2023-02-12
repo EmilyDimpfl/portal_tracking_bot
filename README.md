@@ -10,7 +10,7 @@ You can manage your bots on Discord's application developer page: https://discor
 
 Once you have set up the bot, you'll want to add your discord bot token to your .env file.
 
-Copy the `env.dev` file to `.env`, and change the `DISCORD_TOKEN=...` to `DISCORD_TOKEN=YOURTOKEN` (where `YOURTOKEN` is the token on the bot application page, obviously). 
+Copy the `env.dev` file to `.env`, and change the `DISCORD_TOKEN=...` to `DISCORD_TOKEN=YOURTOKEN` (where `YOURTOKEN` is the token on the bot application page, obviously).
 
 ## Running
 
